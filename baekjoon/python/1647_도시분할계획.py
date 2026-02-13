@@ -1,37 +1,56 @@
 import sys
 import heapq
 
-N, K = map(int, input().split())
+input = sys.stdin.readline
+
+N, M = map(int, input().split())
 
 adj_list = [[] for _ in range(N+1)]
-for _ in range(K):
-    A,B,C = map(int, input().split())
-    adj_list[A].append((B,C))
-    adj_list[B].append((A,C))
 
-def prim(start):
-    pq = [(0, start)]
-    visited = [0] * (N+1)
-    
-    total_weight = 0
+spanning = [[] for _ in range(N+1)]
+
+pq = []
+
+for i in range(M):
+    u, v, w = map(int, input().split())
+    adj_list[u].append((v,w))
+    adj_list[v].append((u,w))
+    heapq.heappush(pq, (w, u, v))
+visited = [0] * (N+1)
+
+def prim():
+    answer = 0
     count = 0
-    maximum_edge = 0
-
+    max_edge = 0
     while pq:
-        w, v = heapq.heappop(pq)
-
-        if not visited[v]:
-            visited[v] = True
+        weight, start, end = heapq.heappop(pq)
+        
+        if not visited[end]:
+            #print(start, end)
+            visited[end] = True
+            answer += weight
             count += 1
-            total_weight += w
+            spanning[start].append((end, weight))
+            max_edge = max(max_edge, weight)
+            
+        
+        elif not visited[start]:
+            #print(start, end)
+            visited[start] = True
+            answer += weight
+            count += 1
+            spanning[end].append((start, weight))
+            max_edge = max(max_edge, weight)
+        if count == N:
+            break
 
-            maximum_edge = max(maximum_edge, w)
-            if count == N:
-                break
+    print(answer)
+    return answer - max_edge
 
-            for vertex, weight in adj_list[v]:
-                if not visited[vertex]:
-                    heapq.heappush(pq, (weight, vertex))
-    return total_weight - maximum_edge
+print(prim())
 
-print(prim(1))
+# 2,5 3,2 5,1 6,4 6,7
+
+
+# (1,3) (1,6) (2,5) (2,1) (3,2) (6,4)
+
