@@ -1,0 +1,36 @@
+import sys
+input = sys.stdin.readline
+
+# rgb 거리 1과 풀이가 좀 다름
+# 첫번째 집과 마지막 집 색이 같으면 안된다는 조건이 생겨서
+# 첫번째 집 색을 빨간색, 파란색, 초록색 각각 정한뒤 루프를 3번 (dp 초기화도 3번)
+# 각 루프마다 일단 다 돌리고 마지막에 나타난 dp값중 첫번째 집 색깔을 고르지 않은 경우중 최소를 고를 수 있음
+
+# 또는 3차원 dp 만들어서 [][][첫번째집 색] 돌리기
+
+n = int(input())
+
+home = [[0] * n for _ in range(n)]
+
+for i in range(n):
+    home[i][0], home[i][1], home[i][2] = map(int, input().split())
+
+#print(home)
+
+answer = float('inf')
+
+for i in range(3):
+    dp = [[float('inf')] * 3 for _ in range(n)]
+
+    dp[0][i] = home[0][i]
+
+    for j in range(1, n):
+        dp[j][0] = home[j][0] + min(dp[j-1][1], dp[j-1][2])
+        dp[j][1] = home[j][1] + min(dp[j-1][0], dp[j-1][2])
+        dp[j][2] = home[j][2] + min(dp[j-1][0], dp[j-1][1])
+
+    for j in range(3):
+        if i != j:
+            answer = min(answer, dp[n-1][j])
+
+print(answer)
